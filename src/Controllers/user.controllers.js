@@ -64,7 +64,7 @@ const genrateAccessAndRefreshTokens = async(userId) =>{
   }
 
   // Generate tokens
-  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(userNew._id);
+  const { accessToken, refreshToken } = await genrateAccessAndRefreshTokens(userNew._id);
 
   // Store refresh token in database
   await User.findByIdAndUpdate(userNew._id, { refreshToken });
@@ -406,4 +406,5 @@ const genrateAccessAndRefreshTokens = async(userId) =>{
     resetpassword,
     searchprovider,
     registerProvider
+
   }
