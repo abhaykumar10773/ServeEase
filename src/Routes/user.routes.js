@@ -24,7 +24,7 @@ router.route("/registerProvider").post(registerProvider)
 //  router.use(verifyJWT)
  router.route("/login",login).post(login);
  router.route("/logout",logout).post(verifyJWT,logout);
- router.route("/changepassword",changepassword).put(verifyJWT,changepassword);
+ router.route("/changepassword",changepassword).post(verifyJWT,changepassword);
  router.route("/updateaccount",updateaccount).put(verifyJWT,updateaccount);
  router.route("/UpdateProfileimg",UpdateProfileimg).post(verifyJWT,
     upload.fields([
@@ -35,7 +35,7 @@ router.route("/registerProvider").post(registerProvider)
     ]),
     UpdateProfileimg);
  router.route("/Getuserprofile",Getuserprofile).get(verifyJWT,Getuserprofile);
- router.route("/getuserdetails/:id",getuserdetails).get(getuserdetails);
+  
  router.route("/refreshAccessToken",refreshAccessToken).get(verifyJWT,refreshAccessToken);
  router.route("/Forgotpassword",Forgotpassword).post(verifyJWT,Forgotpassword);
  router.route("/resetpassword",resetpassword).post(verifyJWT,resetpassword);

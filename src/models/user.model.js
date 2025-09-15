@@ -44,7 +44,7 @@ const userSchema = new Schema(
          type: Schema.Types.ObjectId,
           ref: 'Service'
     },
-    serviceArea: { type: { type: String }, coordinates: [] } ,
+    // serviceArea: { type: String , coordinates: [] } ,
 
         password:{
             type:String,
@@ -57,11 +57,11 @@ const userSchema = new Schema(
             type:String,
         }
     },{
-        Timestamp:true
+        timestamp:true
     }
 );
 
-userSchema.index({ serviceArea: "2dsphere" });
+//   userSchema.index({ serviceArea: "2dsphere" });
 
 
 userSchema.pre("save" , async function (next){
@@ -77,7 +77,7 @@ userSchema.pre("save" , async function (next){
 };
 
 // create generate access tokens 
-userSchema.methods.genrateAccessToken = function(){
+userSchema.methods.generateAccessToken = function(){
     return jwt.sign(
         {
             _id:this._id,
@@ -92,7 +92,7 @@ userSchema.methods.genrateAccessToken = function(){
 }
 
 
-userSchema.methods.genrateRefreshToken = function(){
+userSchema.methods.generateRefreshToken = function(){
     return jwt.sign(
         {
             _id:this._id,

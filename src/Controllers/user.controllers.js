@@ -12,8 +12,8 @@ const genrateAccessAndRefreshTokens = async(userId) =>{
              throw new ApiError(404, "User not found");
          }
          
-         const accessToken = users.genrateAccessToken()
-         const refreshToken = users.genrateRefreshToken()
+         const accessToken = users.generateAccessToken()
+         const refreshToken = users.generateRefreshToken()
           users.refreshToken = refreshToken;    // store the token
          await users.save({validateBeforeSave: false})
   
@@ -163,7 +163,7 @@ const genrateAccessAndRefreshTokens = async(userId) =>{
         );
       });
        
-
+  // it's api is not working check it 
   const changepassword = asyncHandler(async (req,res) => { 
     const {oldpassword,newpassword} = req.body;
       
@@ -171,8 +171,8 @@ const genrateAccessAndRefreshTokens = async(userId) =>{
       throw new ApiError("oldpassword is required ");
     }
        //user id find to the db
-     const user = await User.findById(req.User?._id)
-    console.log(user);
+     const user = await User.findById(req.user?._id)  // fix the issue that Users to users becuase it takes databse argyment 
+    console.log("user id is", user);
      if(!user){
       throw new ApiError(400,"user details not found ")
      }
@@ -196,16 +196,16 @@ const genrateAccessAndRefreshTokens = async(userId) =>{
      console.log("userid",req.users._id)
    
         const user = await User.findByIdAndUpdate(
-          req.users?._id,
+          req.user?._id,
           {
             $set:{
               FullName: FullName,
               contact: contact,
               gender: gender,
-              "address.street": street,
-              "address.city": city,      
-              "address.state": state,    
-             "address.zipcode": zipcode 
+        "address.street": street,
+        "address.city": city,
+        "address.state": state,
+        "address.zipcode": zipcode,
           }
           },
           {
@@ -213,7 +213,7 @@ const genrateAccessAndRefreshTokens = async(userId) =>{
             upsert:true
           }
         ).select("-password ")
-
+        
         console.log("usershow",user)
       if(!user){
         throw new ApiError("user details not updated ")
