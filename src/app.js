@@ -35,7 +35,7 @@ app.use(cors({
 }));
 
 // Optional preflight
-app.options("*", cors({
+app.options( cors({
   origin: frontendUrl,
   methods: "GET, POST, PUT, DELETE, OPTIONS",
   allowedHeaders: "Content-Type, Authorization",
