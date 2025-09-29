@@ -24,17 +24,23 @@ const corsOptions = {
     cors: corsOptions,
   });
 
-  app.options("*", (req, res) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:5173");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.header("Access-Control-Allow-Credentials", "true");
-    return res.sendStatus(204);
-  });
-  
-  // Use CORS before routes
-  app.use(cors(corsOptions));
+ 
+const frontendUrl = process.env.FRONTEND_URL;
 
+app.use(cors({
+  origin: frontendUrl,           // dynamic frontend URL
+  methods: "GET, POST, PUT, DELETE, OPTIONS",
+  allowedHeaders: "Content-Type, Authorization",
+  credentials: true
+}));
+
+// Optional preflight
+app.options("*", cors({
+  origin: frontendUrl,
+  methods: "GET, POST, PUT, DELETE, OPTIONS",
+  allowedHeaders: "Content-Type, Authorization",
+  credentials: true
+}));
 
 // Store connected providers & users
 const onlineProviders = new Map();
