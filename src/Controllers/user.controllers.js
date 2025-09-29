@@ -190,41 +190,41 @@ const genrateAccessAndRefreshTokens = async(userId) =>{
         .status(200)
         .json(new ApiResponse(200,{},"user password changed successfully "))
   })
+  
+const updateaccount = asyncHandler(async (req, res) => {
+  const { FullName, contact, street, city, state, zipcode, gender } = req.body;
 
-  const updateaccount = asyncHandler(async (req,res) => {
-     const { FullName ,contact , street ,city,state,zipcode,gender} =req.body;
-     console.log("userid",req.users._id)
-   
-        const user = await User.findByIdAndUpdate(
-          req.user?._id,
-          {
-            $set:{
-              FullName: FullName,
-              contact: contact,
-              gender: gender,
-        "address.street": street,
-        "address.city": city,
-        "address.state": state,
-        "address.zipcode": zipcode,
-          }
-          },
-          {
-            new:true,
-            upsert:true
-          }
-        ).select("-password ")
-        
-        console.log("usershow",user)
-      if(!user){
-        throw new ApiError("user details not updated ")
-      }
+  const updateFields = {
+    FullName,
+    contact,
+    gender,
+    "address.street": street,
+    "address.city": city,
+    "address.state": state,
+    "address.zipcode": zipcode,
+  };
 
-      return res
-      .status(200)
-      .json(
-        new ApiResponse(200,user,"update account details successfully ")
-      )
-  });
+  // agar image aayi hai toh upload karo
+  if (req.files?.profileimg?.[0]) {
+    const profileImgUrl = await uploadOncloudinary(localprofile);
+    if (profileImgUrl) updateFields.profileimg = profileImgUrl;
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    { $set: updateFields },
+    { new: true }
+  ).select("-password");
+
+  if (!user) {
+    throw new ApiError(400, "User details not updated");
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, user, "Account details updated successfully")
+  );
+});
+
 
   const UpdateProfileimg = asyncHandler(async (req,res) => {
          const localprofile = req.files?.profileimg[0]?.path;

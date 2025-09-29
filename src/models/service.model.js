@@ -22,17 +22,17 @@ const serviceSchema= new Schema(
             ref: "User", // Link to the provider who offers the service
           
         },
-        serviceArea: {
-            type: {
-              type: String,
-              enum: ["Point"], // Use "Point" to define a service area
-              required: true,
-            },
-            coordinates: {
-              type: [Number], // Array of arrays of [longitude, latitude]
-              required: true,
-            },
-          },
+       serviceArea: {
+  type: {
+    type: String,
+    enum: ["Point"],
+    required: true,
+  },
+  coordinates: {
+    type: [Number], // [longitude, latitude]
+    required: true,
+  },
+},
           radius: {
             type: Number, // Radius in kilometers
             required: true,

@@ -11,22 +11,48 @@ import {io} from "../app.js";
 // Step 1: Search Providers in the Area
 
 // Geocoding function using HERE Maps
-const getCoordinatesFromLocation = async (locationName,city) => {
-  const hereApiKey = "74sDSdKcPruzGToHytQmhNHCSZ-3AJA_OGtH9KjNMTc"; // Replace with your HERE Maps API key
+// const getCoordinatesFromLocation = async (locationName,city) => {
+//   const hereApiKey = "74sDSdKcPruzGToHytQmhNHCSZ-3AJA_OGtH9KjNMTc"; // Replace with your HERE Maps API key
+//   const query = `${locationName}, ${city}`;
+//   const geocodingURL = `https://geocode.search.hereapi.com/v1/geocode?q=${encodeURIComponent(
+//     query
+//   )}&apikey=${hereApiKey}`;
+
+//   const response = await axios.get(geocodingURL);
+
+//   if (response.data.items && response.data.items.length > 0) {
+//     const { lat, lng } = response.data.items[0].position;
+//     return { latitude: lat, longitude: lng };
+//   } else {
+//     throw new ApiError(401, "Unable to get coordinates for the given location.");
+//   }
+// };
+
+
+
+
+const getCoordinatesFromLocation = async (locationName, city) => {
   const query = `${locationName}, ${city}`;
-  const geocodingURL = `https://geocode.search.hereapi.com/v1/geocode?q=${encodeURIComponent(
+  const geocodingURL = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
     query
-  )}&apikey=${hereApiKey}`;
+  )}&format=json&limit=1`;
 
-  const response = await axios.get(geocodingURL);
+  // IMPORTANT: User-Agent dena mandatory hai Nominatim ke liye
+  const response = await axios.get(geocodingURL, {
+    headers: {
+      "User-Agent": "serveease-app/1.0 (test@example.com)"
+    }
+  });
 
-  if (response.data.items && response.data.items.length > 0) {
-    const { lat, lng } = response.data.items[0].position;
-    return { latitude: lat, longitude: lng };
+  if (response.data && response.data.length > 0) {
+    const { lat, lon } = response.data[0];
+    return { latitude: parseFloat(lat), longitude: parseFloat(lon) };
   } else {
-    throw new ApiError(401, "Unable to get coordinates for the given location.");
+    throw new Error("Unable to get coordinates for the given location.");
   }
 };
+
+
 
 // @desc    Search All Service Providers in Area
 // @route   POST /api/services/search
@@ -40,8 +66,20 @@ const searchServiceProviders = asyncHandler(async (req, res) => {
   }
 
   // Convert location name to coordinates
-  const { latitude, longitude } = await getCoordinatesFromLocation(locationName, city);
+  // const { latitude, longitude } = await getCoordinatesFromLocation(locationName, city);
 
+
+  const { latitude, longitude } = await getCoordinatesFromLocation(locationName, city).catch(err => {
+    console.error("Geocoding error:", err.message);
+    return { latitude: null, longitude: null };
+});
+
+if (!latitude || !longitude) {
+    res.status(404);
+    throw new Error("Unable to find coordinates for this location. Try more specific address.");
+}
+
+console.log("lat long",latitude,longitude);
   // Fetch services with provider details
   const services = await Service.find({
     category, // Use the category from the request
@@ -51,13 +89,13 @@ const searchServiceProviders = asyncHandler(async (req, res) => {
           type: "Point",
           coordinates: [longitude, latitude],
         },
-        $maxDistance: 4000, // Adjust distance as needed
+        $maxDistance: 15000, // Adjust distance as needed
       },
     },
   }).populate("provider", "FullName contact email profileimg address"); 
  
   // sirf in fields ko response me layega
-
+console.log("ssss",services);
   if (services.length === 0) {
     res.status(404);
     throw new Error("No service providers found for the specified category in this location.");
@@ -235,5 +273,6 @@ export {
   getAllProviderBookings,
   AcceptBooking,
   RejectBooking,
-  CompleteBooking
+  CompleteBooking,
+  getCoordinatesFromLocation
 }
