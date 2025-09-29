@@ -9,13 +9,19 @@ dotenv.config();
 const app = express();
 
 // Create HTTP server for Socket.IO
-const server = createServer(app);
+
+const frontendUrl = process.env.FRONTEND_URL;
+
 const corsOptions = {
-    origin: [process.env.CORS_ORIGIN], // Update with your frontend URL
-    methods: ["GET", "POST"],
+    origin: frontendUrl,
+    methods: ["GET","POST","PUT","DELETE","OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  };
+    credentials: true
+};
+
+// REST API CORS
+   app.use(cors(corsOptions));
+
   console.log("Allowed CORS Origin:", process.env.CORS_ORIGIN);
 
 
@@ -25,22 +31,21 @@ const corsOptions = {
   });
 
  
-const frontendUrl = process.env.FRONTEND_URL;
 
-app.use(cors({
-  origin: frontendUrl,           // dynamic frontend URL
-  methods: "GET, POST, PUT, DELETE, OPTIONS",
-  allowedHeaders: "Content-Type, Authorization",
-  credentials: true
-}));
+// app.use(cors({
+//   origin: frontendUrl,           // dynamic frontend URL
+//   methods: "GET, POST, PUT, DELETE, OPTIONS",
+//   allowedHeaders: "Content-Type, Authorization",
+//   credentials: true
+// }));
 
 // Optional preflight
-app.options( cors({
-  origin: frontendUrl,
-  methods: "GET, POST, PUT, DELETE, OPTIONS",
-  allowedHeaders: "Content-Type, Authorization",
-  credentials: true
-}));
+// app.options( cors({
+//   origin: frontendUrl,
+//   methods: "GET, POST, PUT, DELETE, OPTIONS",
+//   allowedHeaders: "Content-Type, Authorization",
+//   credentials: true
+// }));
 
 // Store connected providers & users
 const onlineProviders = new Map();
