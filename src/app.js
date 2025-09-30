@@ -26,6 +26,8 @@ const corsOptions = {
 
 
   // Create Socket.io Server
+  const server = createServer(app);
+  
   const io = new Server(server, {
     cors: corsOptions,
   });
